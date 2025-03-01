@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:hyperhire_interview_app/widgets/footer_widget.dart';
-
+import '../provider/user_provider.dart';
 import '../widgets/review_item_list.dart';
 import 'profile_detail_screen.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -23,38 +26,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedIndex = ref.watch(selectedIndexProvider);
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-  int _currentBanner = 0;
+    final List<Widget> _tabPages = [
+      const HomeTab(),
+      const Center(child: Text('카테고리')),
+      const Center(child: Text('찜')),
+      const Center(child: Text('마이페이지')),
+    ];
 
-  final List<String> bannerImages = [
-    'assets/Top_Banner.png',
-    'assets/Top_Banner.png',
-    'assets/Top_Banner.png',
-  ];
-
-  final List<Widget> _tabPages = [
-    const HomeTab(),
-    const Center(child: Text('카테고리')),
-    const Center(child: Text('찜')),
-    const Center(child: Text('마이페이지')),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Logo')),
-      body: _tabPages[_selectedIndex],
+      body: _tabPages[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        currentIndex: selectedIndex,
+        onTap: (index) =>
+            ref.read(selectedIndexProvider.notifier).state = index,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
@@ -69,24 +61,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomeTab extends StatefulWidget {
+class HomeTab extends ConsumerWidget {
   const HomeTab({super.key});
 
   @override
-  _HomeTabState createState() => _HomeTabState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentBanner = ref.watch(currentBannerProvider);
 
-class _HomeTabState extends State<HomeTab> {
-  int _currentBanner = 0;
+    final List<String> bannerImages = [
+      'assets/Top_Banner.png',
+      'assets/Top_Banner.png',
+      'assets/Top_Banner.png',
+    ];
 
-  final List<String> bannerImages = [
-    'assets/Top_Banner.png',
-    'assets/Top_Banner.png',
-    'assets/Top_Banner.png',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -100,7 +87,7 @@ class _HomeTabState extends State<HomeTab> {
               viewportFraction: 1,
               autoPlay: true,
               onPageChanged: (index, reason) {
-                setState(() => _currentBanner = index);
+                ref.read(currentBannerProvider.notifier).state = index;
               },
             ),
           ),
@@ -116,7 +103,7 @@ class _HomeTabState extends State<HomeTab> {
                 margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _currentBanner == index ? Colors.blue : Colors.grey,
+                  color: currentBanner == index ? Colors.blue : Colors.grey,
                 ),
               ),
             ),

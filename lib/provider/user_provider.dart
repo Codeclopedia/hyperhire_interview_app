@@ -9,3 +9,7 @@ final userProvider = Provider<User>((ref) {
         "http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg",
   );
 });
+
+// State Providers
+final selectedIndexProvider = StateProvider<int>((ref) => 0);
+final currentBannerProvider = StateProvider<int>((ref) => 0);
